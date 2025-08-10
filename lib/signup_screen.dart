@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -23,42 +24,60 @@ class _SignupScreenState extends State<SignupScreen> {
       _error = null;
     });
     try {
+      print('Google sign-out...');
+      await _googleSignIn.signOut();
+      print('Google sign-in...');
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      print('Google user: ' + (googleUser?.email ?? 'null'));
       if (googleUser == null) {
         setState(() {
           _isLoading = false;
           _error = 'Google sign-in cancelled';
         });
+        print('User cancelled Google sign-in');
         return;
       }
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
+      print('Got Google auth');
       final credential = GoogleAuthProvider.credential(
         idToken: googleAuth.idToken,
         accessToken: googleAuth.accessToken,
       );
+      print('Signing in to Firebase with Google credential...');
       final UserCredential userCredential = await FirebaseAuth.instance
           .signInWithCredential(credential);
+      print('AFTER signInWithCredential, currentUser: [32m[1m${FirebaseAuth.instance.currentUser}[0m');
       final user = userCredential.user;
+      print('Firebase user: ' + (user?.uid ?? 'null'));
       if (user != null) {
         final doc = await FirebaseFirestore.instance
             .collection('users')
             .doc(user.uid)
             .get();
         final data = doc.data();
-        if (data == null ||
-            data['name'] == null ||
-            data['phone'] == null ||
-            data['name'].toString().isEmpty ||
-            data['phone'].toString().isEmpty) {
-          if (!mounted) return;
-          Navigator.of(context).pushReplacementNamed('/complete-profile');
-          return;
-        }
-        if (!mounted) return;
-        Navigator.of(context).pushReplacementNamed('/');
+        print('Firestore user doc: ' + (data?.toString() ?? 'null'));
+        bool profileComplete =
+            data != null &&
+            data['name'] != null &&
+            data['phone'] != null &&
+            data['name'].toString().trim().isNotEmpty &&
+            data['phone'].toString().trim().isNotEmpty;
+
+        // Navigation is now handled by StreamBuilder in main.dart
+        // Optionally, you can show a message or update UI state here
+        // Do NOT manually navigate
+        return;
       }
-    } catch (e) {
+      if (!mounted) return;
+      print('User is null after Firebase sign-in!');
+      setState(() {
+        _error = 'Google sign-in failed: User is null.';
+        _isLoading = false;
+      });
+    } catch (e, stack) {
+      print('Google sign-in error: ' + e.toString());
+      print(stack.toString());
       setState(() {
         _error = 'Google sign-in failed: ${e.toString()}';
         _isLoading = false;

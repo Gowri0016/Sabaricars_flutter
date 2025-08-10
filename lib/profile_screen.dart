@@ -123,20 +123,6 @@ class ProfileScreen extends StatelessWidget {
       ),
     );
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            tooltip: 'Search Vehicles',
-            onPressed: onSearchIconTap,
-          ),
-        ],
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 1,
-      ),
       body: scrollable
           ? SingleChildScrollView(child: profileContent)
           : profileContent,

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:flutter/services.dart';
 import 'firebase_service.dart';
 
 class VehicleCard extends StatefulWidget {
@@ -39,10 +41,93 @@ class _VehicleCardState extends State<VehicleCard> {
   }
 
   Future<void> _handleShare(BuildContext context, String name) async {
-    final text = 'Check out this vehicle on Sabari Cars: $name';
-    // You can use Share.share from share_plus package for real sharing
-    final snackBar = SnackBar(content: Text('Share: $text'));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    final vehicle = widget.vehicle;
+    final String baseUrl = 'https://sabaricars.com/vehicle';
+    final String vehicleId = vehicle['id']?.toString() ?? '';
+    final String shareUrl = vehicleId.isNotEmpty ? '$baseUrl/$vehicleId' : baseUrl;
+    final String text = 'Check out this vehicle on Sabari Cars: $name\n$shareUrl';
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      backgroundColor: Colors.white,
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.share, color: Color(0xFF2563eb), size: 28),
+                    const SizedBox(width: 10),
+                    Text('Share Vehicle', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Color(0xFF222222))),
+                  ],
+                ),
+                const SizedBox(height: 18),
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF2563eb),
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(double.infinity, 48),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  icon: const Icon(Icons.apps),
+                  label: const Text('Share via...'),
+                  onPressed: () {
+                    Share.share(text);
+                    Navigator.pop(ctx);
+                  },
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFF5F6FA),
+                    foregroundColor: const Color(0xFF2563eb),
+                    minimumSize: const Size(double.infinity, 48),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  icon: const Icon(Icons.link),
+                  label: const Text('Copy Link'),
+                  onPressed: () async {
+                    await Clipboard.setData(ClipboardData(text: shareUrl));
+                    Navigator.pop(ctx);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Row(
+                          children: const [
+                            Icon(Icons.check, color: Color(0xFF2563eb)),
+                            SizedBox(width: 8),
+                            Text('Link copied to clipboard!'),
+                          ],
+                        ),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  shareUrl,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 13, color: Color(0xFF888888)),
+                ),
+                const SizedBox(height: 2),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Future<void> _handleToggleFavorite() async {

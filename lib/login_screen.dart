@@ -28,10 +28,10 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      // Attempt to sign in with Google
+      // Always show account picker by signing out first
+      await _googleSignIn.signOut();
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
-      // If the user cancels the sign-in, googleUser will be null.
       if (googleUser == null) {
         setState(() {
           _isLoading = false;
@@ -39,44 +39,34 @@ class _LoginScreenState extends State<LoginScreen> {
         return;
       }
 
-      // Get the authentication details from the signed-in user.
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-
-      // Create a new Firebase credential using the Google tokens.
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
       final credential = GoogleAuthProvider.credential(
         idToken: googleAuth.idToken,
         accessToken: googleAuth.accessToken,
       );
 
-      // Sign in to Firebase with the Google credential.
-      UserCredential userCredential = await FirebaseAuth.instance
-          .signInWithCredential(credential);
-
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      print('AFTER signInWithCredential, currentUser: [32m[1m${FirebaseAuth.instance.currentUser}[0m');
       final user = userCredential.user;
       if (user != null) {
-        final doc = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .get();
+        final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
         final data = doc.data();
 
-        // Check if the user's profile is complete.
-        if (data == null ||
-            data['name'] == null ||
-            data['phone'] == null ||
-            data['name'].toString().isEmpty ||
-            data['phone'].toString().isEmpty) {
-          if (!mounted) return;
-          // Navigate to the complete profile screen if data is missing.
-          Navigator.of(context).pushReplacementNamed('/complete-profile');
-          return;
-        }
-      }
+        // Check if both name and phone exist and are not empty
+        bool profileComplete = data != null &&
+          data['name'] != null && data['phone'] != null &&
+          data['name'].toString().trim().isNotEmpty &&
+          data['phone'].toString().trim().isNotEmpty;
 
+        // Navigation is now handled by StreamBuilder in main.dart
+        // Optionally, you can show a message or update UI state here
+        // Do NOT manually navigate
+        return;
+      }
       if (!mounted) return;
-      // Navigate to the main screen after successful login.
-      Navigator.of(context).pushReplacementNamed('/');
+      setState(() {
+        _error = 'Google sign-in failed: User is null.';
+      });
     } catch (e) {
       setState(() {
         _error = 'Google sign-in failed: ${e.toString()}';
