@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -47,7 +46,9 @@ class _SignupScreenState extends State<SignupScreen> {
       print('Signing in to Firebase with Google credential...');
       final UserCredential userCredential = await FirebaseAuth.instance
           .signInWithCredential(credential);
-      print('AFTER signInWithCredential, currentUser: [32m[1m${FirebaseAuth.instance.currentUser}[0m');
+      print(
+        'AFTER signInWithCredential, currentUser: [32m[1m${FirebaseAuth.instance.currentUser}[0m',
+      );
       final user = userCredential.user;
       print('Firebase user: ' + (user?.uid ?? 'null'));
       if (user != null) {
@@ -57,7 +58,7 @@ class _SignupScreenState extends State<SignupScreen> {
             .get();
         final data = doc.data();
         print('Firestore user doc: ' + (data?.toString() ?? 'null'));
-        bool profileComplete =
+        bool _ =
             data != null &&
             data['name'] != null &&
             data['phone'] != null &&

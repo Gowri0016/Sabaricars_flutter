@@ -80,6 +80,31 @@ class AppDrawer extends StatelessWidget {
               Navigator.pushNamed(context, '/request');
             },
           ),
+          ListTile(
+            leading: const Icon(Icons.sell, color: Colors.deepPurple),
+            title: const Text('Sell Your Vehicle'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/sell');
+            },
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.privacy_tip_outlined),
+            title: const Text('Privacy Policy'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/privacy-policy');
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.description_outlined),
+            title: const Text('Terms & Conditions'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/terms-conditions');
+            },
+          ),
         ],
       ),
     );

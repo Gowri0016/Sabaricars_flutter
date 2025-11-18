@@ -39,24 +39,33 @@ class _LoginScreenState extends State<LoginScreen> {
         return;
       }
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
       final credential = GoogleAuthProvider.credential(
         idToken: googleAuth.idToken,
         accessToken: googleAuth.accessToken,
       );
 
-      UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
-      print('AFTER signInWithCredential, currentUser: [32m[1m${FirebaseAuth.instance.currentUser}[0m');
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithCredential(credential);
+      print(
+        'AFTER signInWithCredential, currentUser: [32m[1m${FirebaseAuth.instance.currentUser}[0m',
+      );
       final user = userCredential.user;
       if (user != null) {
-        final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+        final doc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
         final data = doc.data();
 
         // Check if both name and phone exist and are not empty
-        bool profileComplete = data != null &&
-          data['name'] != null && data['phone'] != null &&
-          data['name'].toString().trim().isNotEmpty &&
-          data['phone'].toString().trim().isNotEmpty;
+        bool _ =
+            data != null &&
+            data['name'] != null &&
+            data['phone'] != null &&
+            data['name'].toString().trim().isNotEmpty &&
+            data['phone'].toString().trim().isNotEmpty;
 
         // Navigation is now handled by StreamBuilder in main.dart
         // Optionally, you can show a message or update UI state here

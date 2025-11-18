@@ -10,6 +10,10 @@ import 'login_screen.dart';
 import 'signup_screen.dart';
 import 'complete_profile_screen.dart';
 import 'vehicle_details_screen.dart';
+import 'theme.dart';
+import 'sell_vehicle_screen.dart';
+import 'privacy_policy_screen.dart';
+import 'terms_conditions_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,14 +28,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Sabari Cars',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.light(),
       home: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
-          print('Auth state changed: user = [32m[1m[4m[7m${snapshot.data}[0m');
+          print(
+            'Auth state changed: user = [32m[1m[4m[7m${snapshot.data}[0m',
+          );
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Scaffold(
               body: Center(child: CircularProgressIndicator()),
@@ -51,6 +54,9 @@ class MyApp extends StatelessWidget {
         '/about': (context) => AboutUsScreen(),
         '/contact': (context) => ContactUsScreen(),
         '/request': (context) => RequestVehicleScreen(),
+        '/sell': (context) => const SellVehicleScreen(),
+        '/privacy-policy': (context) => const PrivacyPolicyScreen(),
+        '/terms-conditions': (context) => const TermsConditionsScreen(),
       },
       onGenerateRoute: (settings) {
         if (settings.name == '/vehicle-details') {

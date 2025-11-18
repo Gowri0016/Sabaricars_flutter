@@ -30,6 +30,7 @@ class _ModernCategoriesState extends State<ModernCategories> {
     setState(() {
       loadingCategories = true;
     });
+    // Assuming _firebaseService.getCategories() returns Future<List<Map<String, dynamic>>>
     final cats = await _firebaseService.getCategories();
     setState(() {
       categories = cats;
@@ -87,13 +88,6 @@ class _ModernCategoriesState extends State<ModernCategories> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFFe8f0fe), Color(0xFFf7f9fb)],
-          ),
-        ),
         child: Center(
           child: Container(
             constraints: const BoxConstraints(maxWidth: 900),
@@ -117,7 +111,6 @@ class _ModernCategoriesState extends State<ModernCategories> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.category_rounded, size: 32, color: Color(0xFF5b8df6)),
                       const SizedBox(width: 12),
                       const Text(
                         'Browse by Category',
@@ -134,10 +127,7 @@ class _ModernCategoriesState extends State<ModernCategories> {
                   const SizedBox(height: 18),
                   Text(
                     'Find your perfect vehicle by selecting a category below.',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey.shade700,
-                    ),
+                    style: TextStyle(fontSize: 16, color: Colors.grey.shade700),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 30),
@@ -149,89 +139,61 @@ class _ModernCategoriesState extends State<ModernCategories> {
                           ),
                         )
                       : categories.isEmpty
-                        ? const Text('No categories found.', style: TextStyle(color: Colors.grey, fontSize: 18))
-                        : GridView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 22,
-                              mainAxisSpacing: 22,
-                              childAspectRatio: 2.8,
-                            ),
-                            itemCount: categories.length,
-                            itemBuilder: (context, idx) {
-                              final cat = categories[idx];
-                              final isSelected = selectedCategory != null &&
-                                  ((selectedCategory!['id'] != null &&
-                                          cat['id'] != null &&
-                                          selectedCategory!['id'] == cat['id']) ||
-                                      (selectedCategory!['name'] != null &&
-                                          cat['name'] != null &&
-                                          selectedCategory!['name'] == cat['name']));
-                              return InkWell(
-                                borderRadius: BorderRadius.circular(16),
-                                onTap: () => handleCategoryClick(cat),
-                                child: AnimatedContainer(
-                                  duration: const Duration(milliseconds: 180),
-                                  curve: Curves.ease,
-                                  decoration: BoxDecoration(
-                                    color: isSelected
-                                        ? const Color(0xFF5b8df6)
-                                        : Colors.white,
-                                    borderRadius: BorderRadius.circular(16),
-                                    border: Border.all(
-                                      color: isSelected
-                                          ? const Color(0xFF2563eb)
-                                          : const Color(0xFFe3e9ff),
-                                      width: isSelected ? 2.5 : 1.2,
+                      ? const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 20),
+                          child: Text(
+                            'No categories found.',
+                            style: TextStyle(color: Colors.grey, fontSize: 18),
+                          ),
+                        )
+                      : Column(
+                          children: [
+                            for (final cat in categories)
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8,
+                                ),
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(12),
+                                  onTap: () => handleCategoryClick(cat),
+                                  child: Container(
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: const Color(0xFFe3e9ff),
+                                        width: 1.5,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withAlpha(8),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
                                     ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: isSelected
-                                            ? const Color(0xFF5b8df6).withOpacity(0.10)
-                                            : const Color(0xFF3c3c3c).withOpacity(0.05),
-                                        blurRadius: isSelected ? 18 : 10,
-                                        offset: const Offset(0, 4),
-                                      ),
-                                    ],
-                                  ),
-                                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
-                                  child: Row(
-                                    children: [
-                                      CircleAvatar(
-                                        backgroundColor: isSelected
-                                            ? Colors.white
-                                            : const Color(0xFFe3e9ff),
-                                        radius: 22,
-                                        child: Icon(
-                                          cat['icon'] ?? Icons.directions_car,
-                                          color: isSelected
-                                              ? const Color(0xFF5b8df6)
-                                              : const Color(0xFF2563eb),
-                                          size: 28,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                      vertical: 18,
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        cat['name'] ?? '',
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w500,
+                                          color: Color(0xFF1a2236),
+                                          letterSpacing: 0.3,
                                         ),
+                                        textAlign: TextAlign.center,
                                       ),
-                                      const SizedBox(width: 16),
-                                      Expanded(
-                                        child: Text(
-                                          cat['name'] ?? '',
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w600,
-                                            color: isSelected ? Colors.white : const Color(0xFF1a2236),
-                                            letterSpacing: 0.01,
-                                          ),
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ],
+                                    ),
                                   ),
                                 ),
-                              );
-                            },
-                          ),
+                              ),
+                          ],
+                        ),
                 ],
               ),
             ),
