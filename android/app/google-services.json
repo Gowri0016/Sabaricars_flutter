@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "311059865252",
+    "project_id": "sabari-cars",
+    "storage_bucket": "sabari-cars.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:311059865252:android:4bafafea75029e7cdbd031",
+        "android_client_info": {
+          "package_name": "com.sabaricars.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "311059865252-u74vc3145mmshd6ubrc0eo46c4f9qqm0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sabaricars.app",
+            "certificate_hash": "50db5263de4b13653353ca6fe9928193ec9175a1"
+          }
+        },
+        {
+          "client_id": "311059865252-0ertbc1jrbki4jmbrjahpdbv916kfceo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXXhcbtJVQDT9qo231ArhxoLM76jR3ch4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "311059865252-0ertbc1jrbki4jmbrjahpdbv916kfceo.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "311059865252-62h16ll75vopor5ijdstptttstn7nt6m.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.sabaricars.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
